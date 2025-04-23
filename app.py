@@ -76,13 +76,19 @@ if "trades" in st.session_state and st.button("🌠  Enrich + show"):
         st.stop()
 
     # convert to numeric first
-ts = pd.to_numeric(df["timestamp"], errors="coerce")
+    # robust epoch-unit detector
+    ts = pd.to_numeric(df["timestamp"], errors="coerce")
 
-# pick seconds vs milliseconds by magnitude
-unit = "ms" if ts.dropna().gt(1e11).any() else "s"
+    if ts.dropna().gt(1e17).any():      # ≥ 100 quadrillion → nanoseconds
+        unit = "ns"
+    elif ts.gt(1e14).any():             # ≥ 100 trillion   → microseconds
+        unit = "us"
+    elif ts.gt(1e11).any():             # ≥ 100 billion    → milliseconds
+        unit = "ms"
+    else:                               # otherwise        → seconds
+        unit = "s"
 
-df["timestamp"] = pd.to_datetime(ts, unit=unit, errors="coerce")
-
+    df["timestamp"] = pd.to_datetime(ts, unit=unit, errors="coerce")
     df["date"]      = df["timestamp"].dt.date
     df["sun"]       = df["date"].apply(sun_sign)
     df["moon"]      = df["date"].apply(moon_phase)
