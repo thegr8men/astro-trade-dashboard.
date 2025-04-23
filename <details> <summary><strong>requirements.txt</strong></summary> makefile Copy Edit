@@ -1,7 +1,0 @@
-streamlit
-pandas
-matplotlib
-requests
-hyperliquid-python-sdk
-flatlib==0.3.12        # astrology + Swiss Ephemeris
-python-dateutil
