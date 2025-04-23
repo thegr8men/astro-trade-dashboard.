@@ -1,1 +1,7 @@
-streamlit hyperliquid-python-sdk pandas matplotlib flatlib
+streamlit
+pandas
+matplotlib
+requests
+hyperliquid-python-sdk
+flatlib==0.3.12
+pyswisseph==2.10.3
