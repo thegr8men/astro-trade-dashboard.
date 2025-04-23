@@ -1,0 +1,33 @@
+"""
+astro.py  – natal chart + transit helpers
+"""
+from flatlib.chart import Chart
+from flatlib import ephem, const
+from datetime import datetime, timezone, timedelta
+
+ORBS_DEG = 6  # max distance for an aspect to count
+
+
+def load_natal(cfg):
+    """Build a natal chart object from config dict."""
+    dt = datetime(cfg["year"], cfg["month"], cfg["day"],
+                  cfg["hour"], cfg["minute"],
+                  tzinfo=timezone(timedelta(hours=5.5)))  # IST
+    pos = ephem.Observer(latitude=cfg["lat"], longitude=cfg["lon"])
+    return Chart(dt.isoformat(), pos, hsys="placidus")
+
+
+def active_aspects(natal, transit):
+    """
+    Return list of strings like 'Moon->Venus:tri'
+    for all natal planets within ±ORBS_DEG of a major aspect angle.
+    """
+    hits = []
+    for p_nat in const.LIST_OBJECTS:
+        for p_tr in const.LIST_OBJECTS:
+            diff = abs(natal[p_nat].lon - transit[p_tr].lon) % 360
+            for name, angle in [("conj", 0), ("sex", 60), ("sqr", 90),
+                                ("tri", 120), ("opp", 180)]:
+                if abs(diff - angle) <= ORBS_DEG:
+                    hits.append(f"{p_tr}->{p_nat}:{name}")
+    return hits
