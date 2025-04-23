@@ -37,7 +37,7 @@ def sun_sign(d: date):
             "Leo"      if(m==7 and d>=23)or(m==8 and d<=22)else
             "Virgo"    if(m==8 and d>=23)or(m==9 and d<=22)else
             "Libra"    if(m==9 and d>=23)or(m==10 and d<=22)else
-            "Scorpio"  if(m==10and d>=23)or(m==11and d<=21)else"Sagittarius")
+            "Scorpio"  if(m==10 and d>=23)or(m==11 and d<=21)else"Sagittarius")
 
 def moon_phase(d: date):
     y,m,dd=d.year,d.month,d.day
