@@ -4,4 +4,4 @@ matplotlib
 requests
 hyperliquid-python-sdk
 flatlib==0.2.3
-pyswisseph==2.10.3
+pyswisseph==2.8.0.post1
