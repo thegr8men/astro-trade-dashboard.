@@ -48,23 +48,37 @@ def moon_phase(d: date):
 
 # ---------- Download button ----------
 if st.button("🔄  Fetch latest trades"):
-    from hyperliquid.info import Info
-    info=Info()
-    hl=pd.DataFrame(info.user_fills(WALLET_EVM)).rename(
-        columns={"coin":"asset","closedPnl":"pnl"})
-    hl["venue"]="Hyperliquid"
-    st.session_state["trades"]=hl          # store in memory
+    info = Info()
+    hl = pd.DataFrame(info.user_fills(WALLET_EVM)).rename(
+        columns={
+            "coin": "asset",
+            "closedPnl": "pnl",
+            "time": "timestamp"          # rename for consistency
+        }
+    )
+    hl["venue"] = "Hyperliquid"
+    st.session_state["trades"] = hl
     st.success(f"Pulled {len(hl)} Hyperliquid fills")
 
 # ---------- Enrich & display ----------
 if "trades" in st.session_state and st.button("🌠  Enrich + show"):
-    df=st.session_state["trades"]
-    df["timestamp"]=pd.to_datetime(df["timestamp"],unit="s")
-    df["date"]=df["timestamp"].dt.date
-    df["sun"]=df["date"].apply(sun_sign)
-    df["moon"]=df["date"].apply(moon_phase)
+    df = st.session_state["trades"]
+
+    # ensure timestamp column exists
+    if "timestamp" not in df.columns and "time" in df.columns:
+        df = df.rename(columns={"time": "timestamp"})
+
+    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+    df["date"] = df["timestamp"].dt.date
+    df["sun"] = df["date"].apply(sun_sign)
+    df["moon"] = df["date"].apply(moon_phase)
+
     # quick heat-map
-    pivot=df.pivot_table(index="moon",columns="sun",values="pnl",aggfunc="sum",fill_value=0)
+    pivot = df.pivot_table(index="moon",
+                           columns="sun",
+                           values="pnl",
+                           aggfunc="sum",
+                           fill_value=0)
     st.dataframe(pivot.style.format("{:,.2f}"))
 else:
     st.info("First fetch, then enrich.")
