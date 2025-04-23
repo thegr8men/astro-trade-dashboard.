@@ -75,7 +75,14 @@ if "trades" in st.session_state and st.button("🌠  Enrich + show"):
         st.error("No 'timestamp' column – check API JSON keys.")
         st.stop()
 
-    df["timestamp"] = pd.to_datetime(df["timestamp"], unit="s")
+    # convert to numeric first
+ts = pd.to_numeric(df["timestamp"], errors="coerce")
+
+# pick seconds vs milliseconds by magnitude
+unit = "ms" if ts.dropna().gt(1e11).any() else "s"
+
+df["timestamp"] = pd.to_datetime(ts, unit=unit, errors="coerce")
+
     df["date"]      = df["timestamp"].dt.date
     df["sun"]       = df["date"].apply(sun_sign)
     df["moon"]      = df["date"].apply(moon_phase)
