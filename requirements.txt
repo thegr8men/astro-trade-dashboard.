@@ -3,5 +3,5 @@ pandas
 matplotlib
 requests
 hyperliquid-python-sdk
-flatlib==0.3.12
+flatlib==0.2.3
 pyswisseph==2.10.3
